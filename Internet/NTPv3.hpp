@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Internet.hpp"
+
 constexpr std::int32_t NTP_PORT = 123;
 constexpr std::uint64_t NTP_PACKET_SIZE = 48;
 constexpr std::uint32_t NTP_TIMESTAMP_DELAT = 2208988800;

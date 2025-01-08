@@ -1,6 +1,5 @@
 #include "Internet.hpp"
 
-
 int
 main(
 	void
