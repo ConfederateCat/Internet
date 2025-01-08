@@ -6,6 +6,9 @@ constexpr std::int32_t NTP_PORT = 123;
 constexpr std::uint32_t NTP_TIMESTAMP_DELTA = 2208988800;
 
 //
+// All following data taken from https://datatracker.ietf.org/doc/html/rfc1305#appendix-A.
+// To-Do: Add values for other members of the struct.
+// 
 // Attributes LeadIndicator.
 //
 constexpr std::uint8_t LI_NO_WARNING = 0b00;
