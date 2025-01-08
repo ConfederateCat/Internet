@@ -35,7 +35,7 @@ main(
 		return 1;
 	}
 
-	ssize_t Sent = sendto(SockFd, &Packet, NTP_PACKET_SIZE, 0, reinterpret_cast<sockaddr*>(&ServerAddress), sizeof(ServerAddress));
+	ssize_t Sent = sendto(SockFd, &Packet, sizeof(NTP_3_HEADER), 0, reinterpret_cast<sockaddr*>(&ServerAddress), sizeof(ServerAddress));
 
 	if (Sent < 0)
 	{
@@ -49,7 +49,7 @@ main(
 	//
 	sockaddr_in ReceiveAddress{};
 	socklen_t AddressLength = sizeof(ReceiveAddress);
-	ssize_t Received = recvfrom(SockFd, &Packet, NTP_PACKET_SIZE, 0, reinterpret_cast<sockaddr*>(&ReceiveAddress), &AddressLength);
+	ssize_t Received = recvfrom(SockFd, &Packet, sizeof(NTP_3_HEADER), 0, reinterpret_cast<sockaddr*>(&ReceiveAddress), &AddressLength);
 
 	if (Received < 0)
 	{

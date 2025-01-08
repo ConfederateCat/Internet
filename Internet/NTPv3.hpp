@@ -3,13 +3,37 @@
 #include "Internet.hpp"
 
 constexpr std::int32_t NTP_PORT = 123;
-constexpr std::uint64_t NTP_PACKET_SIZE = 48;
 constexpr std::uint32_t NTP_TIMESTAMP_DELAT = 2208988800;
 
+//
+// Attributes LeadIndicator.
+//
 constexpr std::uint8_t LI_NO_WARNING = 0b00;
-constexpr std::uint8_t VN_3 = 0b011;
-constexpr std::uint8_t MODE_CLIENT = 0b011;
+constexpr std::uint8_t LI_LAST_MINUTE_61 = 0b01;
+constexpr std::uint8_t LI_LAST_MINUTE_59 = 0b10;
+constexpr std::uint8_t LI_ALARM_CONDITION = 0b11;
 
+//
+// Attributes VersionNumber.
+//
+constexpr std::uint8_t VN_3 = 0b011;
+
+//
+// Attributes Mode.
+//
+constexpr std::uint8_t MODE_RESERVED = 0b000;
+constexpr std::uint8_t MODE_SYMMETRIC_ACTIVE = 0b001;
+constexpr std::uint8_t MODE_SYMMETRIC_PASSIVE = 0b010;
+constexpr std::uint8_t MODE_CLIENT = 0b011;
+constexpr std::uint8_t MODE_SERVER = 0b100;
+constexpr std::uint8_t MODE_BROADCAST = 0b101;
+constexpr std::uint8_t MODE_RESERVED_CONTROL = 0b110;
+constexpr std::uint8_t MODE_RESERVED_PRIVATE = 0b111;
+
+
+//
+// Performs the LeapIndicator, VersionNumber and Mode bit shifting for the attributes byte.
+//
 #define NTP_CALCULATE_ATTRIBUTES(LeapIndicator, VersionNumber, Mode) \
 	((LeapIndicator << 6) | (VersionNumber << 3) | Mode)
 
