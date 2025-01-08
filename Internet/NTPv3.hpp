@@ -10,24 +10,46 @@ constexpr std::uint8_t LI_NO_WARNING = 0b00;
 constexpr std::uint8_t VN_3 = 0b011;
 constexpr std::uint8_t MODE_CLIENT = 0b011;
 
-constexpr std::uint8_t NTP_HEADER_BYTE = (LI_NO_WARNING << 6) | (VN_3 << 3) | MODE_CLIENT;
+#define NTP_CALCULATE_ATTRIBUTES(LeapIndicator, VersionNumber, Mode) \
+	((LeapIndicator << 6) | (VersionNumber << 3) | Mode)
+
 
 #pragma pack(push, 1)
 typedef struct _NTP_3_HEADER
 {
-	std::uint8_t LeapIndicator : 2;					// 2 bits
-	std::uint8_t VersionNumber : 3;					// 3 bits
-	std::uint8_t Mode : 3;							// 3 bits
+	union {
+        struct {
+            std::uint8_t LeapIndicator : 2;			// 2 bits
+            std::uint8_t VersionNumber : 3;			// 3 bits
+            std::uint8_t Mode : 3;					// 3 bits
+        };
+		std::uint8_t Attributes;					// 8 bits, can't set bits directly due to the compiler inverting the bits
+    };
 	std::uint8_t Stratum;							// 8 bits
 	std::int8_t PollInterval;						// 8 bits
 	std::int8_t Precision;							// 8 bits
 	std::int32_t RootDelay;							// 32 bits
 	std::int32_t RootDispersion;					// 32 bits
 	std::uint32_t ReferenceClockIdentifier;			// 32 bits
-	std::uint64_t ReferenceTimestamp;				// 64 bits
-	std::uint64_t OriginateTimestamp;				// 64 bits
-	std::uint64_t ReceiveTimestamp;					// 64 bits
-	std::uint64_t TransmitTimestamp;				// 64 bit
-
-} NTP_3_HEADER, *PNTP_3_HEADER;
+	struct											// 64 bits
+	{
+		std::uint32_t High;
+		std::uint32_t Low;
+	} ReferenceTimestamp;
+	struct											// 64 bits
+	{
+		std::uint32_t High;
+		std::uint32_t Low;
+	} OriginateTimestamp;
+	struct											// 64 bits
+	{
+		std::uint32_t High;
+		std::uint32_t Low;
+	} ReceiveTimestamp;
+	struct											// 64 bits
+	{
+		std::uint32_t High;
+		std::uint32_t Low;
+	} TransmitTimestamp;
+} NTP_3_HEADER, * PNTP_3_HEADER;
 #pragma pack(pop)
