@@ -14,10 +14,7 @@ constexpr std::uint8_t MODE_CLIENT = 0b011;
 
 constexpr std::uint8_t NTP_HEADER_BYTE = (LI_NO_WARNING << 6) | (VN_3 << 3) | MODE_CLIENT;
 
-int
-main(
-	void
-)
+int main(void)
 {
 	//
 	// Create and zero out the NTP packet.
