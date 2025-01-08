@@ -61,7 +61,7 @@ main(
 	//
 	// Extract timestamps from the received packet.
 	//
-	std::time_t UnixTime = Util::BigEndianToLittleEndian32(Packet.TransmitTimestamp.High) - NTP_TIMESTAMP_DELAT;
+	std::time_t UnixTime = Util::BigEndianToLittleEndian32(Packet.TransmitTimestamp.High) - NTP_TIMESTAMP_DELTA;
 
 	std::cout << "Synchronized time: " << std::ctime(&UnixTime);
 

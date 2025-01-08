@@ -3,7 +3,7 @@
 #include "Internet.hpp"
 
 constexpr std::int32_t NTP_PORT = 123;
-constexpr std::uint32_t NTP_TIMESTAMP_DELAT = 2208988800;
+constexpr std::uint32_t NTP_TIMESTAMP_DELTA = 2208988800;
 
 //
 // Attributes LeadIndicator.
