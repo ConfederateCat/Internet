@@ -61,9 +61,15 @@ main(
 	//
 	// Extract timestamps from the received packet.
 	//
-	std::time_t UnixTime = Util::BigEndianToLittleEndian32(Packet.TransmitTimestamp.High) - NTP_TIMESTAMP_DELTA;
+	std::time_t TransmitTimestamp = Util::BigEndianToLittleEndian32(Packet.TransmitTimestamp.High) - NTP_TIMESTAMP_DELTA;
+	std::time_t ReceiveTimestamp = Util::BigEndianToLittleEndian32(Packet.ReceiveTimestamp.High) - NTP_TIMESTAMP_DELTA;
+	std::time_t OriginateTimestamp = Util::BigEndianToLittleEndian32(Packet.OriginateTimestamp.High) - NTP_TIMESTAMP_DELTA;
+	std::time_t ReferenceTimestamp = Util::BigEndianToLittleEndian32(Packet.ReferenceTimestamp.High) - NTP_TIMESTAMP_DELTA;
 
-	std::cout << "Synchronized time: " << std::ctime(&UnixTime);
+	std::cout << "TransmitTimestamp: " << std::ctime(&TransmitTimestamp) << std::endl;
+	std::cout << "ReceiveTimestamp: " << std::ctime(&ReceiveTimestamp) << std::endl;
+	std::cout << "OriginateTimestamp: " << std::ctime(&OriginateTimestamp) << std::endl;
+	std::cout << "ReferenceTimestamp: " << std::ctime(&ReferenceTimestamp) << std::endl;
 
 	close(SockFd);
 	return 0;

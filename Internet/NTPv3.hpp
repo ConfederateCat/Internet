@@ -40,7 +40,9 @@ constexpr std::uint8_t MODE_RESERVED_PRIVATE = 0b111;
 #define NTP_CALCULATE_ATTRIBUTES(LeapIndicator, VersionNumber, Mode) \
 	((LeapIndicator << 6) | (VersionNumber << 3) | Mode)
 
-
+//
+// The header struct uses big-endian format.
+//
 #pragma pack(push, 1)
 typedef struct _NTP_3_HEADER
 {
@@ -58,25 +60,41 @@ typedef struct _NTP_3_HEADER
 	std::int32_t RootDelay;							// 32 bits
 	std::int32_t RootDispersion;					// 32 bits
 	std::uint32_t ReferenceClockIdentifier;			// 32 bits
-	struct											// 64 bits
+	union											// 64 bits
 	{
-		std::uint32_t High;
-		std::uint32_t Low;
+		struct
+		{
+			std::uint32_t High;
+			std::uint32_t Low;
+		};
+		std::uint64_t Full;
 	} ReferenceTimestamp;
-	struct											// 64 bits
+	union											// 64 bits
 	{
-		std::uint32_t High;
-		std::uint32_t Low;
+		struct
+		{
+			std::uint32_t High;
+			std::uint32_t Low;
+		};
+		std::uint64_t Full;
 	} OriginateTimestamp;
-	struct											// 64 bits
+	union											// 64 bits
 	{
-		std::uint32_t High;
-		std::uint32_t Low;
+		struct
+		{
+			std::uint32_t High;
+			std::uint32_t Low;
+		};
+		std::uint64_t Full;
 	} ReceiveTimestamp;
-	struct											// 64 bits
+	union											// 64 bits
 	{
-		std::uint32_t High;
-		std::uint32_t Low;
+		struct
+		{
+			std::uint32_t High;
+			std::uint32_t Low;
+		};
+		std::uint64_t Full;
 	} TransmitTimestamp;
 } NTP_3_HEADER, * PNTP_3_HEADER;
 #pragma pack(pop)
