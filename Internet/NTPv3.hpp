@@ -33,7 +33,6 @@ constexpr std::uint8_t MODE_BROADCAST = 0b101;
 constexpr std::uint8_t MODE_RESERVED_CONTROL = 0b110;
 constexpr std::uint8_t MODE_RESERVED_PRIVATE = 0b111;
 
-
 //
 // Performs the LeapIndicator, VersionNumber and Mode bit shifting for the attributes byte.
 //
@@ -41,7 +40,47 @@ constexpr std::uint8_t MODE_RESERVED_PRIVATE = 0b111;
 	((LeapIndicator << 6) | (VersionNumber << 3) | Mode)
 
 //
+// Stratum.
+//
+constexpr std::uint8_t STRATUM_UNSPECIFIED = 0;
+constexpr std::uint8_t STRATUM_PRIMARY_REF = 1;
+constexpr std::uint8_t STRATUM_SECONDARY_REF = 2;
+
+//
+// PollIntervall.
+// "This is a signed integer indicating the minimum interval between transmitted messages, in seconds as a power of two."
+//
+constexpr std::int8_t NTP_MINPOLL = -6;
+constexpr std::int8_t NTP_MAXPOLL = 17;
+constexpr std::int8_t POLL_INTERVAL_1SEC = 0;
+constexpr std::int8_t POLL_INTERVAL_2SEC = 1;
+constexpr std::int8_t POLL_INTERVAL_4SEC = 2;
+constexpr std::int8_t POLL_INTERVAL_8SEC = 3;
+	
+#define NTP_CALCULATE_POLL_INTERVAL(Microseconds) \
+    ((Microseconds) < 0 ? NTP_MINPOLL : \
+    (std::log2(static_cast<double>(Microseconds) / 1000) < NTP_MINPOLL ? NTP_MINPOLL : \
+    (std::log2(static_cast<double>(Microseconds) / 1000) > NTP_MAXPOLL ? NTP_MAXPOLL : \
+    std::log2(static_cast<double>(Microseconds) / 1000))))
+
+//
+// Precision.
+// "This is a signed integer indicating the precision of the various clocks, in seconds to the nearest power of two.
+// The value must be rounded to the next larger power of two;
+// for instance, a 50 - Hz(20 ms) or 60 - Hz(16.67ms) power - frequency clock would be assigned the value - 5 (31.25 ms),
+// while a 1000 - Hz(1 ms) crystal - controlled clock would be assigned the value - 9 (1.95 ms)."
+//
+#define HZ_TO_SEC(Hz) \
+	((1000.0 / (Hz)) / 1000)
+#define EXPONENT_OF_NEXT_POWER_OF_2(x) \
+	(static_cast<int>(std::ceil(std::log2(x))))
+
+#define NTP_CALCULATE_PRECISION(Hz) \
+	EXPONENT_OF_NEXT_POWER_OF_2(HZ_TO_SEC(Hz))
+
+//
 // The header struct uses big-endian format.
+// OriginateTimestamp is a random value, due to security concerns. Reference: https://www.ietf.org/archive/id/draft-ietf-ntp-data-minimization-04.txt.
 //
 #pragma pack(push, 1)
 typedef struct _NTP_3_HEADER

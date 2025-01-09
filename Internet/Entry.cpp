@@ -1,5 +1,7 @@
 #include "Internet.hpp"
 
+
+
 int
 main(
 	void
@@ -35,6 +37,29 @@ main(
 		return 1;
 	}
 
+	//
+	// Set OriginateTimestamp.
+	// Example: Unix time 1633514001.123456
+	// High part will be 1633514001 + NTP_TIMESTAMP_DELTA in big-endian format
+	// Low part will be the fractional part 0.123456 multiplied by 2^32, in big-endian format
+	//
+	std::time_t CurrentTime = std::time(nullptr);
+	Packet.OriginateTimestamp.High = Util::SwitchEndianness32(static_cast<uint32_t>(CurrentTime + NTP_TIMESTAMP_DELTA));
+	Packet.OriginateTimestamp.Low = Util::SwitchEndianness32(static_cast<std::uint32_t>(std::fmod(CurrentTime, 1.0) * (1 << 32)));
+
+	//
+	// Set the poll interval.
+	//
+	Packet.PollInterval = NTP_CALCULATE_POLL_INTERVAL(1000);
+
+	//
+	// Set the precision.
+	//
+	Packet.Precision = NTP_CALCULATE_PRECISION(1000);
+
+	//
+	// Send the packet.
+	//
 	ssize_t Sent = sendto(SockFd, &Packet, sizeof(NTP_3_HEADER), 0, reinterpret_cast<sockaddr*>(&ServerAddress), sizeof(ServerAddress));
 
 	if (Sent < 0)
@@ -60,16 +85,10 @@ main(
 
 	//
 	// Extract timestamps from the received packet.
+	// Timestamps are in big endian format, we have to convert them to little endian format first.
 	//
-	std::time_t TransmitTimestamp = Util::BigEndianToLittleEndian32(Packet.TransmitTimestamp.High) - NTP_TIMESTAMP_DELTA;
-	std::time_t ReceiveTimestamp = Util::BigEndianToLittleEndian32(Packet.ReceiveTimestamp.High) - NTP_TIMESTAMP_DELTA;
-	std::time_t OriginateTimestamp = Util::BigEndianToLittleEndian32(Packet.OriginateTimestamp.High) - NTP_TIMESTAMP_DELTA;
-	std::time_t ReferenceTimestamp = Util::BigEndianToLittleEndian32(Packet.ReferenceTimestamp.High) - NTP_TIMESTAMP_DELTA;
-
+	std::time_t TransmitTimestamp = Util::SwitchEndianness32(Packet.TransmitTimestamp.High) - NTP_TIMESTAMP_DELTA;
 	std::cout << "TransmitTimestamp: " << std::ctime(&TransmitTimestamp) << std::endl;
-	std::cout << "ReceiveTimestamp: " << std::ctime(&ReceiveTimestamp) << std::endl;
-	std::cout << "OriginateTimestamp: " << std::ctime(&OriginateTimestamp) << std::endl;
-	std::cout << "ReferenceTimestamp: " << std::ctime(&ReferenceTimestamp) << std::endl;
 
 	close(SockFd);
 	return 0;

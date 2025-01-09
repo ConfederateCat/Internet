@@ -5,7 +5,7 @@
 namespace Util
 {
 	std::uint32_t
-	BigEndianToLittleEndian32(
+	SwitchEndianness32(
 		std::uint32_t Value
 	);
 }

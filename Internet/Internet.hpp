@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <cstdint>
 #include <netdb.h>
+#include <algorithm>
+#include <cmath>
 
 #include "NTPv3.hpp"
 #include "Util.hpp"

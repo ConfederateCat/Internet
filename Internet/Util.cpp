@@ -1,8 +1,8 @@
 #include "Util.hpp"
 
 std::uint32_t
-Util::BigEndianToLittleEndian32(
-	std::uint32_t Value
+Util::SwitchEndianness32(
+    std::uint32_t Value
 )
 {
     return ((Value >> 24) & 0x000000FF) |               // Move byte 0 to byte 3
