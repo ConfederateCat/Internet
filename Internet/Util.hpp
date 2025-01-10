@@ -18,4 +18,9 @@ namespace Util
 	SwitchEndianness64(
 	std::uint64_t Value
 	);
+
+	float
+	GetFrequency(
+		void
+	);
 }

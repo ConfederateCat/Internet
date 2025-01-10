@@ -10,17 +10,14 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <chrono>
+#include <cstring>
 
 #include "NTPv3.hpp"
 #include "Util.hpp"
 
 namespace Client
 {
-	float
-	GetFrequency(
-		void
-	);
-
 	std::string
 	GetIp(
 		const std::string& Domain

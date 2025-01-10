@@ -33,3 +33,23 @@ Util::SwitchEndianness64(
         ((Value << 40) & 0x00FF000000000000) |
         ((Value << 56) & 0xFF00000000000000);
 }
+
+float
+Util::GetFrequency(
+    void
+)
+{
+    std::ifstream CpuInfo("/proc/cpuinfo");
+    std::string Key = "cpu MHz";
+    std::string Line;
+
+    while (std::getline(CpuInfo, Line))
+    {
+        if (Line.find(Key) != std::string::npos)
+        {
+            return std::stoi(Line.substr(Line.find(":") + 1));
+        }
+    }
+
+    return 0;
+}

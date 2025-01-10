@@ -31,14 +31,14 @@ constexpr std::uint8_t VN_3 = 0b011;
 //
 // Attributes Mode.
 //
-constexpr std::uint8_t MODE_RESERVED = 0b000;
+constexpr std::uint8_t MODE_RESERVED = 0b000;							// Server doesn't accept this
 constexpr std::uint8_t MODE_SYMMETRIC_ACTIVE = 0b001;
-constexpr std::uint8_t MODE_SYMMETRIC_PASSIVE = 0b010;
+constexpr std::uint8_t MODE_SYMMETRIC_PASSIVE = 0b010;					// Server doesn't accept this
 constexpr std::uint8_t MODE_CLIENT = 0b011;
-constexpr std::uint8_t MODE_SERVER = 0b100;
-constexpr std::uint8_t MODE_BROADCAST = 0b101;
-constexpr std::uint8_t MODE_RESERVED_CONTROL = 0b110;
-constexpr std::uint8_t MODE_RESERVED_PRIVATE = 0b111;
+constexpr std::uint8_t MODE_SERVER = 0b100;								// Server doesn't accept this
+constexpr std::uint8_t MODE_BROADCAST = 0b101;							// Server doesn't accept this
+constexpr std::uint8_t MODE_RESERVED_CONTROL = 0b110;					// Server doesn't accept this
+constexpr std::uint8_t MODE_RESERVED_PRIVATE = 0b111;					// Server doesn't accept this
 
 //
 // Performs the LeapIndicator, VersionNumber and Mode bit shifting for the attributes byte.
@@ -69,8 +69,8 @@ constexpr std::uint8_t STRATUM_SECONDARY_REF = 2;
 // PollIntervall.
 // "This is a signed integer indicating the minimum interval between transmitted messages, in seconds as a power of two."
 //
-constexpr std::int8_t NTP_MINPOLL = -6;
-constexpr std::int8_t NTP_MAXPOLL = 17;
+constexpr std::int8_t NTP_MINPOLL = 6;
+constexpr std::int8_t NTP_MAXPOLL = 10;
 constexpr std::int8_t POLL_INTERVAL_1SEC = 0;
 constexpr std::int8_t POLL_INTERVAL_2SEC = 1;
 constexpr std::int8_t POLL_INTERVAL_4SEC = 2;
@@ -115,7 +115,10 @@ typedef union _NTP_TIMESTAMP
 
 //
 // The header struct uses big-endian format.
-// OriginateTimestamp is a random value, due to security concerns. Reference: https://www.ietf.org/archive/id/draft-ietf-ntp-data-minimization-04.txt.
+// RootDelay is calculated by the server by comparing its primary reference clock against its system time (e.g., std::time).
+// The custom server implementation doesn't have a hardware based reference clock, therefore it will set it to a constant value.
+// The constant value will be 0, copying the behavior of time.google.com.
+// 
 //
 #pragma pack(push, 1)
 typedef struct _NTP_3_HEADER
@@ -143,11 +146,13 @@ typedef struct _NTP_3_HEADER
 
 namespace NTPv3
 {
-	//
-	// Generates an NTP timestamp (big-endian format.
-	//
 	NTP_TIMESTAMP
 	GenerateTimestamp(
+		void
+	);
+
+	NTP_TIMESTAMP
+	GenerateRandomTimestamp(
 		void
 	);
 }

@@ -1,25 +1,5 @@
 #include "Client.hpp"
 
-float
-Client::GetFrequency(
-	void
-)
-{
-	std::ifstream CpuInfo("/proc/cpuinfo");
-	std::string Key = "cpu MHz";
-	std::string Line;
-
-	while (std::getline(CpuInfo, Line))
-	{
-		if (Line.find(Key) != std::string::npos)
-		{
-			return std::stoi(Line.substr(Line.find(":") + 1));
-		}
-	}
-
-	return 0;
-}
-
 std::string
 Client::GetIp(
 	const std::string& Domain
