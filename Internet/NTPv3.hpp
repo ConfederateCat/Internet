@@ -1,8 +1,15 @@
 #pragma once
 
-#include "Internet.hpp"
+#include "Client.hpp"
 
+//
+// Standard NTP port, assigned by the Internet Assigned Numbers Authority.
+//
 constexpr std::int32_t NTP_PORT = 123;
+
+//
+// Difference in seconds between the Unix epoch (January 1, 1970, 00:00:00 UTC) and the NTP epoch (January 1, 1900, 00:00:00 UTC).
+//
 constexpr std::uint32_t NTP_TIMESTAMP_DELTA = 2208988800;
 
 //
@@ -56,7 +63,7 @@ constexpr std::int8_t POLL_INTERVAL_1SEC = 0;
 constexpr std::int8_t POLL_INTERVAL_2SEC = 1;
 constexpr std::int8_t POLL_INTERVAL_4SEC = 2;
 constexpr std::int8_t POLL_INTERVAL_8SEC = 3;
-	
+
 #define NTP_CALCULATE_POLL_INTERVAL(Microseconds) \
     ((Microseconds) < 0 ? NTP_MINPOLL : \
     (std::log2(static_cast<double>(Microseconds) / 1000) < NTP_MINPOLL ? NTP_MINPOLL : \
@@ -79,6 +86,22 @@ constexpr std::int8_t POLL_INTERVAL_8SEC = 3;
 	EXPONENT_OF_NEXT_POWER_OF_2(HZ_TO_SEC(Hz))
 
 //
+// NTP timestamp.
+// Uses big-endian format.
+//
+#pragma pack(push, 1)
+typedef union _NTP_TIMESTAMP
+{
+	struct
+	{
+		std::uint32_t High;
+		std::uint32_t Low;
+	};
+	std::uint64_t Full;
+} NTP_TIMESTAMP, * PNTP_TIMESTAMP;
+#pragma pack(pop)
+
+//
 // The header struct uses big-endian format.
 // OriginateTimestamp is a random value, due to security concerns. Reference: https://www.ietf.org/archive/id/draft-ietf-ntp-data-minimization-04.txt.
 //
@@ -86,54 +109,33 @@ constexpr std::int8_t POLL_INTERVAL_8SEC = 3;
 typedef struct _NTP_3_HEADER
 {
 	union {
-        struct {
-            std::uint8_t LeapIndicator : 2;			// 2 bits
-            std::uint8_t VersionNumber : 3;			// 3 bits
-            std::uint8_t Mode : 3;					// 3 bits
-        };
+		struct {
+			std::uint8_t LeapIndicator : 2;			// 2 bits
+			std::uint8_t VersionNumber : 3;			// 3 bits
+			std::uint8_t Mode : 3;					// 3 bits
+		};
 		std::uint8_t Attributes;					// 8 bits, can't set bits directly due to the compiler inverting the bits
-    };
+	};
 	std::uint8_t Stratum;							// 8 bits
 	std::int8_t PollInterval;						// 8 bits
 	std::int8_t Precision;							// 8 bits
 	std::int32_t RootDelay;							// 32 bits
 	std::int32_t RootDispersion;					// 32 bits
 	std::uint32_t ReferenceClockIdentifier;			// 32 bits
-	union											// 64 bits
-	{
-		struct
-		{
-			std::uint32_t High;
-			std::uint32_t Low;
-		};
-		std::uint64_t Full;
-	} ReferenceTimestamp;
-	union											// 64 bits
-	{
-		struct
-		{
-			std::uint32_t High;
-			std::uint32_t Low;
-		};
-		std::uint64_t Full;
-	} OriginateTimestamp;
-	union											// 64 bits
-	{
-		struct
-		{
-			std::uint32_t High;
-			std::uint32_t Low;
-		};
-		std::uint64_t Full;
-	} ReceiveTimestamp;
-	union											// 64 bits
-	{
-		struct
-		{
-			std::uint32_t High;
-			std::uint32_t Low;
-		};
-		std::uint64_t Full;
-	} TransmitTimestamp;
+	NTP_TIMESTAMP ReferenceTimestamp;				// 64 bits
+	NTP_TIMESTAMP OriginateTimestamp;				// 64 bits
+	NTP_TIMESTAMP ReceiveTimestamp;					// 64 bits
+	NTP_TIMESTAMP TransmitTimestamp;				// 64 bits
 } NTP_3_HEADER, * PNTP_3_HEADER;
 #pragma pack(pop)
+
+namespace NTPv3
+{
+	//
+	// Generates an NTP timestamp (big-endian format.
+	//
+	NTP_TIMESTAMP
+	GenerateTimestamp(
+		void
+	);
+}

@@ -9,6 +9,20 @@
 #include <netdb.h>
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 
 #include "NTPv3.hpp"
 #include "Util.hpp"
+
+namespace Client
+{
+	float
+	GetFrequency(
+		void
+	);
+
+	const char*
+	GetIp(
+		const std::string& Domain
+	);
+}

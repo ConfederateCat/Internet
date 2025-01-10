@@ -1,6 +1,4 @@
-#include "Internet.hpp"
-
-
+#include "Client.hpp"
 
 int
 main(
@@ -18,9 +16,9 @@ main(
 	//
 	sockaddr_in ServerAddress = { 0 };
 	ServerAddress.sin_family = AF_INET;
-	ServerAddress.sin_port = htons(NTP_PORT);
+	ServerAddress.sin_port = Util::SwitchEndianness16(12345); // fix port later
 
-	if (inet_pton(AF_INET, "216.239.35.0", &ServerAddress.sin_addr) <= 0)
+	if (inet_pton(AF_INET, "172.23.215.204", &ServerAddress.sin_addr) <= 0)
 	{
 		std::cerr << "inet_pton failed" << std::endl;
 		return 1;
@@ -40,13 +38,11 @@ main(
 	//
 	// Set OriginateTimestamp.
 	// Example: Unix time 1633514001.123456
-	// High part will be 1633514001 + NTP_TIMESTAMP_DELTA in big-endian format
-	// Low part will be the fractional part 0.123456 multiplied by 2^32, in big-endian format
+	// High part will be 1633514001 + NTP_TIMESTAMP_DELTA in big-endian format.
+	// Low part will be the fractional part 0.123456 multiplied by 2^32, in big-endian format.
 	//
-	std::time_t CurrentTime = std::time(nullptr);
-	Packet.OriginateTimestamp.High = Util::SwitchEndianness32(static_cast<uint32_t>(CurrentTime + NTP_TIMESTAMP_DELTA));
-	Packet.OriginateTimestamp.Low = Util::SwitchEndianness32(static_cast<std::uint32_t>(std::fmod(CurrentTime, 1.0) * (1 << 32)));
-
+	Packet.OriginateTimestamp.Full = NTPv3::GenerateTimestamp().Full;
+	
 	//
 	// Set the poll interval.
 	//
@@ -55,7 +51,7 @@ main(
 	//
 	// Set the precision.
 	//
-	Packet.Precision = NTP_CALCULATE_PRECISION(1000);
+	Packet.Precision = NTP_CALCULATE_PRECISION(Client::GetFrequency());
 
 	//
 	// Send the packet.
