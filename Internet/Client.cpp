@@ -1,6 +1,9 @@
 #include "Client.hpp"
 
-float Client::GetFrequency(void)
+float
+Client::GetFrequency(
+	void
+)
 {
 	std::ifstream CpuInfo("/proc/cpuinfo");
 	std::string Key = "cpu MHz";
@@ -17,7 +20,10 @@ float Client::GetFrequency(void)
 	return 0;
 }
 
-std::string Client::GetIp(const std::string& Domain)
+std::string
+Client::GetIp(
+	const std::string& Domain
+)
 {
 	hostent* Host = gethostbyname(Domain.c_str());
 

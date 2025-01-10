@@ -1,6 +1,9 @@
 #include "Client.hpp"
 
-int main(void)
+int
+main(
+	void
+)
 {
 	//
 	// Create and zero out the NTP packet.
