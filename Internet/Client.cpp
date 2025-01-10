@@ -20,7 +20,7 @@ Client::GetFrequency(
 	return 0;
 }
 
-const std::string
+std::string
 Client::GetIp(
 	const std::string& Domain
 )

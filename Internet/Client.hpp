@@ -21,7 +21,7 @@ namespace Client
 		void
 	);
 
-	const std::string
+	std::string
 	GetIp(
 		const std::string& Domain
 	);
