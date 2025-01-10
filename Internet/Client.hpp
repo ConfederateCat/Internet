@@ -16,13 +16,7 @@
 
 namespace Client
 {
-	float
-	GetFrequency(
-		void
-	);
+	float GetFrequency(void);
 
-	std::string
-	GetIp(
-		const std::string& Domain
-	);
+	std::string GetIp(const std::string& Domain);
 }

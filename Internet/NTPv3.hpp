@@ -146,8 +146,5 @@ namespace NTPv3
 	//
 	// Generates an NTP timestamp (big-endian format.
 	//
-	NTP_TIMESTAMP
-		GenerateTimestamp(
-			void
-		);
+	NTP_TIMESTAMP GenerateTimestamp(void);
 }

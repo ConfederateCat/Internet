@@ -1,9 +1,7 @@
 #include "NTPv3.hpp"
 
 NTP_TIMESTAMP
-NTPv3::GenerateTimestamp(
-	void
-)
+NTPv3::GenerateTimestamp(void)
 {
 	std::time_t CurrentTime = std::time(nullptr);
 	NTP_TIMESTAMP Timestamp = { 0 };

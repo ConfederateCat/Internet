@@ -1,9 +1,6 @@
 #include "Util.hpp"
 
-std::uint32_t
-Util::SwitchEndianness32(
-    std::uint32_t Value
-)
+std::uint32_t Util::SwitchEndianness32(std::uint32_t Value)
 {
     return ((Value >> 24) & 0x000000FF) |               // Move byte 0 to byte 3
         ((Value >> 8) & 0x0000FF00) |                   // Move byte 1 to byte 2
@@ -11,18 +8,12 @@ Util::SwitchEndianness32(
         ((Value << 24) & 0xFF000000);                   // Move byte 3 to byte 0
 }
 
-std::uint16_t
-Util::SwitchEndianness16(
-    std::uint16_t Value
-)
+std::uint16_t Util::SwitchEndianness16(std::uint16_t Value)
 {
     return (Value >> 8) | (Value << 8);                 // Swap the high and low bytes
 }
 
-std::uint32_t
-Util::SwitchEndianness64(
-    std::uint64_t Value
-)
+std::uint32_t Util::SwitchEndianness64(std::uint64_t Value)
 {
     return ((Value >> 56) & 0x00000000000000FF) |
         ((Value >> 40) & 0x000000000000FF00) |
