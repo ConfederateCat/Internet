@@ -13,12 +13,13 @@ main(
 
 	//
 	// Configure the server address.
+	// For debugging purpose, we can use local IP (127.0.0.1) and port 12345.
 	//
 	sockaddr_in ServerAddress = { 0 };
 	ServerAddress.sin_family = AF_INET;
-	ServerAddress.sin_port = Util::SwitchEndianness16(NTP_PORT); // fix port later
+	ServerAddress.sin_port = Util::SwitchEndianness16(NTP_PORT);
 
-	if (inet_pton(AF_INET, Client::GetIp("time.nist.gov"), &ServerAddress.sin_addr) <= 0)
+	if (inet_pton(AF_INET, Client::GetIp("time.google.com").c_str(), &ServerAddress.sin_addr) <= 0)
 	{
 		std::cerr << "inet_pton failed" << std::endl;
 		return 1;

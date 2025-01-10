@@ -20,7 +20,7 @@ Client::GetFrequency(
 	return 0;
 }
 
-const char*
+const std::string
 Client::GetIp(
 	const std::string& Domain
 )
@@ -39,5 +39,5 @@ Client::GetIp(
 		return nullptr;
 	}
 
-	return inet_ntoa(*Address);
+	return std::string(inet_ntoa(*Address));
 }
