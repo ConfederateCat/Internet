@@ -16,9 +16,9 @@ main(
 	//
 	sockaddr_in ServerAddress = { 0 };
 	ServerAddress.sin_family = AF_INET;
-	ServerAddress.sin_port = Util::SwitchEndianness16(12345); // fix port later
+	ServerAddress.sin_port = Util::SwitchEndianness16(NTP_PORT); // fix port later
 
-	if (inet_pton(AF_INET, "172.23.215.204", &ServerAddress.sin_addr) <= 0)
+	if (inet_pton(AF_INET, Client::GetIp("time.nist.gov"), &ServerAddress.sin_addr) <= 0)
 	{
 		std::cerr << "inet_pton failed" << std::endl;
 		return 1;
@@ -82,9 +82,12 @@ main(
 	//
 	// Extract timestamps from the received packet.
 	// Timestamps are in big endian format, we have to convert them to little endian format first.
+	// The timestamp returned HAS to be UTC.
+	// To-Do: Fix server to return only UTC time.
 	//
 	std::time_t TransmitTimestamp = Util::SwitchEndianness32(Packet.TransmitTimestamp.High) - NTP_TIMESTAMP_DELTA;
-	std::cout << "TransmitTimestamp: " << std::ctime(&TransmitTimestamp) << std::endl;
+	std::tm* gmtTime = std::gmtime(&TransmitTimestamp);
+	std::cout << "TransmitTimestamp (UTC): " << std::asctime(gmtTime) << std::endl;
 
 	close(SockFd);
 	return 0;

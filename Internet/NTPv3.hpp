@@ -47,6 +47,18 @@ constexpr std::uint8_t MODE_RESERVED_PRIVATE = 0b111;
 	((LeapIndicator << 6) | (VersionNumber << 3) | Mode)
 
 //
+// Reverses the bit shifting for the passed attributes byte and writes the 3 values to the passed arguments.
+//
+#define NTP_REVERSE_ATTRIBUTES(Attributes, LeapIndicator, VersionNumber, Mode) \
+    do \
+	{ \
+        (LeapIndicator) = (Attributes >> 6) & 0x03; \
+        (VersionNumber) = (Attributes >> 3) & 0x07; \
+        (Mode) = (Attributes & 0x07); \
+    } \
+	while (0)
+
+//
 // Stratum.
 //
 constexpr std::uint8_t STRATUM_UNSPECIFIED = 0;
@@ -135,7 +147,7 @@ namespace NTPv3
 	// Generates an NTP timestamp (big-endian format.
 	//
 	NTP_TIMESTAMP
-	GenerateTimestamp(
-		void
-	);
+		GenerateTimestamp(
+			void
+		);
 }
