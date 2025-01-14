@@ -13,10 +13,21 @@ constexpr std::int32_t NTP_PORT = 123;
 constexpr std::uint32_t NTP_TIMESTAMP_DELTA = 2208988800;
 
 //
+// Polling intervals for the server querying its root clock.
+//
+constexpr std::uint64_t NTP_SERVER_ROOT_POLL_MIN = 64;
+constexpr std::uint64_t NTP_SERVER_ROOT_POLL_MAX = 1024;
+
+//
 // All following data taken from https://datatracker.ietf.org/doc/html/rfc1305#appendix-A.
 // To-Do: Add values for other members of the struct.
+
 // 
 // Attributes LeadIndicator.
+// LI_NO_WARNING: No leap second.
+// LI_LAST_MINUTE_61: positive leap second, when leap second is added to UTC.
+// LI_LAST_MINUTE_59: negative leap second, when leap second is removed from UTC (has never occurred yet).
+// LI_ALARM_CONDITION should never occur.
 //
 constexpr std::uint8_t LI_NO_WARNING = 0b00;
 constexpr std::uint8_t LI_LAST_MINUTE_61 = 0b01;
@@ -27,6 +38,7 @@ constexpr std::uint8_t LI_ALARM_CONDITION = 0b11;
 // Attributes VersionNumber.
 //
 constexpr std::uint8_t VN_3 = 0b011;
+constexpr std::uint8_t VN_4 = 0b100;
 
 //
 // Attributes Mode.
@@ -83,6 +95,29 @@ constexpr std::int8_t POLL_INTERVAL_8SEC = 3;
     std::log2(static_cast<double>(Microseconds) / 1000))))
 
 //
+// RootDelay.
+// Sum of the:
+// - time for the request to travel to the secondary server.
+// - time for the secondary server to process the request.
+// - time for the response to travel back from the secondary server.
+// We can just define a macro that measures the time it takes to execute code passed.
+//
+#define NTP_CALCULATE_ROOT_DELAY(Code) \
+	({ \
+		auto Start = std::chrono::high_resolution_clock::now(); \
+		Code \
+		auto End = std::chrono::high_resolution_clock::now(); \
+		std::chrono::duration<double> Elapsed = End - Start; \
+		Elapsed.count(); \
+	})
+
+#define DOUBLE_TO_FIXEDPOINT(Double) \
+	static_cast<std::int32_t>(std::round((Double) * (1 << 16)))
+
+#define FIXEDPOINT_TO_DOUBLE(FixedPoint) \
+	((static_cast<double>(FixedPoint)) / (1 << 16))
+
+//
 // Precision.
 // "This is a signed integer indicating the precision of the various clocks, in seconds to the nearest power of two.
 // The value must be rounded to the next larger power of two;
@@ -91,11 +126,21 @@ constexpr std::int8_t POLL_INTERVAL_8SEC = 3;
 //
 #define HZ_TO_SEC(Hz) \
 	((1000.0 / (Hz)) / 1000)
-#define EXPONENT_OF_NEXT_POWER_OF_2(x) \
-	(static_cast<int>(std::ceil(std::log2(x))))
+
+#define EXPONENT_OF_NEXT_POWER_OF_2(X) \
+	(static_cast<int>(std::ceil(std::log2(X))))
 
 #define NTP_CALCULATE_PRECISION(Hz) \
 	EXPONENT_OF_NEXT_POWER_OF_2(HZ_TO_SEC(Hz))
+
+#define SEC_TO_HZ(Sec) \
+	(1000.0 / ((Sec) * 1000))
+
+#define APPROX_POWER_OF_2(X) \
+	(std::pow(2.0, static_cast<double>(X)))
+
+#define NTP_REVERSE_PRECISION(Precision) \
+	SEC_TO_HZ(APPROX_POWER_OF_2(Precision))
 
 //
 // NTP timestamp.
@@ -114,11 +159,21 @@ typedef union _NTP_TIMESTAMP
 #pragma pack(pop)
 
 //
-// The header struct uses big-endian format.
+// RootDelay.
 // RootDelay is calculated by the server by comparing its primary reference clock against its system time (e.g., std::time).
 // The custom server implementation doesn't have a hardware based reference clock, therefore it will set it to a constant value.
 // The constant value will be 0, copying the behavior of time.google.com.
+//
+constexpr std::int32_t NTP_ROOT_DELAY = 0;
+
+//
+// RootDispersion.
+// "This is a 32-bit signed fixed-point number indicating the maximum error relative to the primary reference source,
+// in seconds with fraction point between bits 15 and 16"
 // 
+
+//
+// The header struct uses big-endian format. 
 //
 #pragma pack(push, 1)
 typedef struct _NTP_3_HEADER
@@ -155,4 +210,20 @@ namespace NTPv3
 	GenerateRandomTimestamp(
 		void
 	);
+
+	std::uint32_t
+	FractionToMs(
+		std::uint32_t Fraction
+	);
+
+	bool
+	IsLeapSecond(
+		NTP_TIMESTAMP Timestamp
+	);
 }
+
+typedef struct _LEAP_SECOND
+{
+	std::uint32_t Seconds;
+	std::int32_t Dtai;
+} LEAP_SECOND, * PLEAD_SECOND;

@@ -12,14 +12,13 @@
 #include <fstream>
 #include <chrono>
 #include <cstring>
+#include <thread>
 
 #include "NTPv3.hpp"
 #include "Util.hpp"
 
-namespace Client
-{
-	std::string
-	GetIp(
-		const std::string& Domain
-	);
-}
+extern bool gDebug;
+extern std::int32_t gPort;
+extern bool gIp;
+extern bool gUrl;
+extern char gAddress[64];

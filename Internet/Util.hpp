@@ -16,11 +16,23 @@ namespace Util
 
 	std::uint32_t
 	SwitchEndianness64(
-	std::uint64_t Value
+		std::uint64_t Value
 	);
 
 	float
 	GetFrequency(
 		void
+	);
+
+	char*
+	GetIp(
+		const char* Domain
+	);
+
+	void
+	PrintBytes(
+		void* Address,
+		std::size_t Length,
+		bool PrintLine
 	);
 }

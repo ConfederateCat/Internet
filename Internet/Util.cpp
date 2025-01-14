@@ -53,3 +53,69 @@ Util::GetFrequency(
 
     return 0;
 }
+
+char*
+Util::GetIp(
+    const char* Domain
+)
+{
+    hostent* Host = gethostbyname(Domain);
+
+    if (!Host)
+    {
+        return nullptr;
+    }
+
+    in_addr* Address = reinterpret_cast<in_addr*>(Host->h_addr_list[0]);
+
+    if (!Address)
+    {
+        return nullptr;
+    }
+
+    return inet_ntoa(*Address);
+}
+
+void
+Util::PrintBytes(
+    void* Address,
+    std::size_t Length,
+    bool PrintLine
+)
+{
+    std::uint8_t* Ptr = static_cast<uint8_t*>(Address);
+    std::cout << std::uppercase;
+
+    for (std::size_t i = 0; i < Length; i += 16)
+    {
+        if (PrintLine)
+        {
+            std::cout << "0x" << std::setw(4) << std::setfill('0') << std::hex << i << ": ";
+        }
+
+        std::size_t BytesToPrint = std::min<std::size_t>(16, Length - i);
+
+        for (std::size_t j = 0; j < BytesToPrint; ++j)
+        {
+            std::cout << std::setw(2) << std::setfill('0') << std::hex << (int)Ptr[i + j] << " ";
+        }
+
+        if (BytesToPrint < 16)
+        {
+            for (std::size_t j = 0; j < 16 - BytesToPrint; j++)
+            {
+                std::cout << "   ";
+            }
+        }
+
+        std::cout << " ";
+
+        for (std::size_t j = 0; j < BytesToPrint; ++j)
+        {
+            char c = Ptr[i + j];
+            std::cout << (std::isprint(c) ? c : '.');
+        }
+
+        std::cout << std::endl;
+    }
+}
