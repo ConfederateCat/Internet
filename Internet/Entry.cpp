@@ -126,11 +126,6 @@ main(
 	NTP_3_HEADER Packet = { 0 };
 	Packet.Attributes = NTP_CALCULATE_ATTRIBUTES(LI_ALARM_CONDITION, VN_3, MODE_CLIENT);
 
-	if (gDebug)
-	{
-		std::cout << "[+] Attributes initialized" << std::endl;
-	}
-
 	//
 	// Configure the server address.
 	// For debugging purpose, we can use local IP (127.0.0.1) and port 12345.
@@ -147,7 +142,7 @@ main(
 
 	if (inet_pton(AF_INET, gAddress, &ServerAddress.sin_addr) <= 0)
 	{
-		std::cerr << "[Error] Failed to convert address '" << gAddress << "' to a valid network address" << std::endl;
+		std::cerr << "[-] Failed to convert address '" << gAddress << "' to a valid network address" << std::endl;
 		return 1;
 	}
 
